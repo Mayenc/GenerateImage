@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate Image</title>
+    <link rel="stylesheet" href="bootstrap.min.css"/>
+    <link rel="stylesheet" href="style.css"/>
+    <link rel="stylesheet" href="loading.css"/>
+</head>
+<body>
+    <form method="post">
+        <div class="container mt-3">
+            <textarea id="TxtGenerateImage" name="message" class="form-control" placeholder="Nhập văn bản chi tiết hình ảnh cần vẽ........."></textarea>
+            <button class="btnGenerate btn btn-success center-button ml-3" type="button">Generate Image</button>
+        </div>
+        <div class="container mt-3">
+            <span id="mgs" style="color: red; display: none;">Vui lòng nhập nội dung vẽ hình để tạo</span>
+        </div>
+    </form>
+    <div class="changeImage">
+        <div id="loading" style="display: none;">
+            <div class="loader">
+                <div class="inner one"></div>
+                <div class="inner two"></div>
+                <div class="inner three"></div>
+            </div>
+        </div>
+        <img id="imageElement" src="" style="display: none; max-height: 50vh;">
+    </div>
+    <script src="jquery-3.2.1.slim.min.js"></script>
+    <script src="bootstrap.min.js"></script>
+    <script src="popper.min.js"></script>
+    <script>
+        $('.btnGenerate').click(function(){
+            var txt = $('#TxtGenerateImage').val();
+            $('#loading').show();
+            if(txt.trim() != ''){
+                const form = new FormData()
+                form.append('prompt', txt)
+        
+                fetch('https://clipdrop-api.co/text-to-image/v1', {
+                method: 'POST',
+                headers: {
+                    'x-api-key': '9edfed9301768271a5d2045b723863e4f6ea328bd968bb1ce4564db12a04fa5a3c6bf64dc303a1b154464e9415fe3d02',
+                },
+                body: form,
+                })
+                .then(response => response.arrayBuffer())
+                .then(buffer => {
+                    const blob = new Blob([buffer], { type: 'image/jpeg' }); // Thay đổi type phù hợp với loại ảnh bạn nhận được
+        
+                    // Tạo URL đối tượng Blob
+                    const imageUrl = URL.createObjectURL(blob);
+        
+                    // Hiển thị ảnh trong thẻ img
+                    const imageElement = document.getElementById('imageElement');
+                    imageElement.src = imageUrl;
+                    $('#loading').hide();
+                    $('#mgs').hide()
+                    $('#imageElement').show();
+                })
+            }
+            else{
+                $('#loading').hide();
+                $('#mgs').show()
+            }
+            
+        })
+    </script>
+</body>
+</html>
+
